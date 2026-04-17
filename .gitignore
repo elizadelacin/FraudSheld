@@ -1,0 +1,30 @@
+# Virtual environment
+venv/
+env/
+
+# Data — too large for GitHub
+data/raw/
+data/processed/
+
+# Trained model — too large for GitHub
+models/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env files
+.env
