@@ -368,8 +368,9 @@ with tab1:
                                     marker_color=colors[::-1],
                                     marker_line_width=0,
                                 ))
+                                shap_layout = {k: v for k, v in PLOTLY_LAYOUT.items() if k != "margin"}
                                 fig_shap.update_layout(
-                                    **PLOTLY_LAYOUT,
+                                    **shap_layout,
                                     height=260,
                                     title="Top Feature Contributions",
                                     xaxis_title="SHAP Value",
