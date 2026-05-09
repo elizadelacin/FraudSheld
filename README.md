@@ -1,9 +1,25 @@
+# FraudShield 🛡️
+
 Real-time credit card fraud detection system built on 590K transactions from the IEEE-CIS Kaggle competition. The project covers the full lifecycle — data cleaning, feature engineering, model training, a REST API, and an interactive dashboard with per-prediction SHAP explanations.
 
-Model Performance
-ROC-AUC0.922AlgorithmXGBoostClass imbalanceSMOTEDecision threshold0.30 (optimized for recall)Training data590,540 transactionsFeatures163
+---
 
-Project Structure
+## Model Performance
+
+| Metric | Value |
+|---|---|
+| ROC-AUC | **0.922** |
+| Algorithm | XGBoost |
+| Class Imbalance | SMOTE |
+| Decision Threshold | 0.30 (optimized for recall) |
+| Training Data | 590,540 transactions |
+| Features | 163 |
+
+---
+
+## Project Structure
+
+```
 FraudShield/
 ├── notebooks/
 │   ├── 01_cleaning.ipynb       # Merge, null handling, type fixes
@@ -33,61 +49,118 @@ FraudShield/
 ├── Dockerfile
 ├── docker-compose.yml
 └── requirements.txt
+```
 
-Feature Engineering
+---
+
+## Feature Engineering
+
 The raw dataset has 400+ columns including anonymized Vesta features (V1–V339), device/email metadata, and transaction details. Key engineering steps:
 
-Time — extracted hour, day_of_week, is_peak_hour from transaction timestamp
-Amount — log1p transform to handle heavy right skew
-Aggregations — card-level and email-level mean/std/count of transaction amounts
-Binary flags — is_mobile, is_anonymous_email, is_high_risk_product, is_discover
-PCA — reduced V1–V339 to ~30 components (95% variance retained)
-Label encoding — categorical columns: card type, device type, product category, email domain
+- **Time** — extracted `hour`, `day_of_week`, `is_peak_hour` from transaction timestamp
+- **Amount** — `log1p` transform to handle heavy right skew
+- **Aggregations** — card-level and email-level mean/std/count of transaction amounts
+- **Binary flags** — `is_mobile`, `is_anonymous_email`, `is_high_risk_product`, `is_discover`
+- **PCA** — reduced V1–V339 to ~30 components (95% variance retained)
+- **Label encoding** — categorical columns: card type, device type, product category, email domain
 
+---
 
-Quickstart
-1. Clone and install
-bashgit clone https://github.com/yourusername/FraudShield.git
+## Quickstart
+
+### 1. Clone and install
+
+```bash
+git clone https://github.com/yourusername/FraudShield.git
 cd FraudShield
 
 python -m venv venv
 venv\Scripts\activate        # macOS/Linux: source venv/bin/activate
 pip install -r requirements.txt
-2. Download data
-Download train_transaction.csv and train_identity.csv from Kaggle and place them in data/raw/.
-3. Run the full pipeline
-bashpython src/pipeline.py
-This runs preprocessing → feature engineering → model training in one command and saves the model to models/xgb_fraud.joblib.
-4. Start the API
-bashuvicorn api.main:app --reload
-# http://localhost:8000/docs
-5. Start the dashboard
-bashstreamlit run dashboard/app.py
-# http://localhost:8501
+```
 
-Docker
-bashdocker-compose up --build
-ServiceURLREST APIhttp://localhost:8000API Docs (Swagger)http://localhost:8000/docsDashboardhttp://localhost:8501
+### 2. Download data
 
-API
-POST /predict
+Download `train_transaction.csv` and `train_identity.csv` from [Kaggle](https://www.kaggle.com/) and place them in `data/raw/`.
+
+### 3. Run the full pipeline
+
+```bash
+python src/pipeline.py
+```
+
+This runs preprocessing → feature engineering → model training in one command and saves the model to `models/xgb_fraud.joblib`.
+
+### 4. Start the API
+
+```bash
+uvicorn api.main:app --reload
+```
+
+API docs available at: http://localhost:8000/docs
+
+### 5. Start the dashboard
+
+```bash
+streamlit run dashboard/app.py
+```
+
+Dashboard available at: http://localhost:8501
+
+---
+
+## Docker
+
+```bash
+docker-compose up --build
+```
+
+| Service | URL |
+|---|---|
+| REST API | http://localhost:8000 |
+| API Docs (Swagger) | http://localhost:8000/docs |
+| Dashboard | http://localhost:8501 |
+
+---
+
+## API — `POST /predict`
+
 Send any subset of features — missing values default to 0.
-bashcurl -X POST http://localhost:8000/predict \
+
+```bash
+curl -X POST http://localhost:8000/predict \
   -H "Content-Type: application/json" \
   -d '{"amt_log": 4.5, "hour": 7, "is_mobile": 1, "is_anonymous_email": 1}'
-json{
+```
+
+```json
+{
   "is_fraud": true,
   "fraud_probability": 0.9717,
   "risk_level": "HIGH"
 }
+```
 
-Dashboard
+---
+
+## Dashboard
+
 Three tabs:
 
-Predict — enter transaction details, get an instant fraud score with a SHAP bar chart explaining which features drove the prediction
-EDA — explore fraud patterns across time, product category, card network, device type, and email domain
-Model — performance metrics, feature engineering summary, and pipeline overview
+- **Predict** — enter transaction details, get an instant fraud score with a SHAP bar chart explaining which features drove the prediction
+- **EDA** — explore fraud patterns across time, product category, card network, device type, and email domain
+- **Model** — performance metrics, feature engineering summary, and pipeline overview
 
+---
 
-Tech Stack
-LayerToolsMLXGBoost, scikit-learn, imbalanced-learnExplainabilitySHAPAPIFastAPI, UvicornDashboardStreamlit, PlotlyDataPandas, NumPy, PyArrowDevOpsDocker, Docker Compose
+## Tech Stack
+
+| Layer | Tools |
+|---|---|
+| ML | XGBoost, scikit-learn, imbalanced-learn |
+| Explainability | SHAP |
+| API | FastAPI, Uvicorn |
+| Dashboard | Streamlit, Plotly |
+| Data | Pandas, NumPy, PyArrow |
+| DevOps | Docker, Docker Compose |
+
